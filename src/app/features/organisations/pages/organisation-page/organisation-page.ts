@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
+import { OrganisationList } from '../../components/organisation-list/organisation-list';
 
 @Component({
-  imports: [],
   selector: 'app-organisation-page',
-  styleUrl: './organisation-page.css',
+  standalone: true,
+  imports: [OrganisationList],
   templateUrl: './organisation-page.html',
+  styleUrl: './organisation-page.css',
 })
 export class OrganisationPage {}

@@ -27,7 +27,7 @@ export class OrganisationService {
 
   getPage(page: number, pageSize: number): Observable<OrganisationPage> {
     return this.http
-      .get<RawOrganisation[]>('assets/data/organisations.json')
+      .get<RawOrganisation[]>('/data/organisations.json')
       .pipe(
         map((records) => this.expandFixture(records)),
         map((records) => {
@@ -54,7 +54,7 @@ export class OrganisationService {
   ): RawOrganisation[] {
     const expanded = [...records];
 
-    for (let index = 0; expanded.length < 140; index++) {
+    for (let index = 0;  expanded.length < 137; index++) {
       const source = records[index % records.length];
 
       expanded.push({

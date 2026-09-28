@@ -1,7 +1,20 @@
 .organisation-page {
-  padding: var(--space-6);
+  width: min(100% - var(--space-8), 1400px);
+  margin: 0 auto;
+  padding: var(--space-8) 0;
 }
 
-.organisation-page h1 {
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-header h1 {
   margin: 0;
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.page-header p {
+  margin: var(--space-2) 0 0;
+  color: var(--color-text-secondary);
 }

@@ -1,1 +1,94 @@
-<p>organisation-list works!</p>
+<section class="organisation-list">
+  @if (loading()) {
+    <div class="state state-loading">
+      <p>Loading organisations...</p>
+    </div>
+  } @else if (error()) {
+    <div class="state state-error">
+      <p>Something went wrong while loading organisations.</p>
+
+      <button type="button" (click)="load()">
+        Try again
+      </button>
+    </div>
+  } @else if (organisations().length === 0) {
+    <div class="state state-empty">
+      <p>No organisations found.</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Members</th>
+            <th>Owner</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+
+        <tbody>
+         @for (organisation of organisations(); track $index) {
+            <tr>
+              <td>{{ organisation.name }}</td>
+
+              <td>
+                <span
+                  class="status"
+                  [class.status-active]="organisation.status === 'active'"
+                  [class.status-inactive]="organisation.status === 'inactive'"
+                  [class.status-suspended]="organisation.status === 'suspended'"
+                >
+                  <span class="status-dot" aria-hidden="true"></span>
+
+                  {{ organisation.status }}
+                </span>
+              </td>
+
+              <td>
+                {{ organisation.memberCount ?? '—' }}
+              </td>
+
+              <td>
+                {{ organisation.ownerEmail ?? '—' }}
+              </td>
+
+              <td>
+                {{
+                  organisation.createdAt
+                    ? (organisation.createdAt | date: 'mediumDate')
+                    : '—'
+                }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button
+        type="button"
+        [disabled]="page() === 0 || loading()"
+        (click)="previousPage()"
+      >
+        Previous
+      </button>
+
+      <span>
+        Page {{ page() + 1 }} of {{ Math.ceil(total() / pageSize) }}
+      </span>
+
+      <button
+        type="button"
+        [disabled]="
+          page() >= Math.ceil(total() / pageSize) - 1 || loading()
+        "
+        (click)="nextPage()"
+      >
+        Next
+      </button>
+    </div>
+  }
+</section>
