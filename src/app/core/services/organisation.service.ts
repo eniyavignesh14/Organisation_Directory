@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, delay, map, throwError } from 'rxjs';
+import { Observable, map, mergeMap, of, throwError, timer } from 'rxjs';
 import { Organisation } from '../models/organisation.model';
+import en from '../../../assets/i18n/en.json';
 
 interface RawOrganisation {
   id: number;
@@ -14,34 +15,28 @@ interface RawOrganisation {
   createdAt: string | number | null;
 }
 
-interface OrganisationPage {
-  items: Organisation[];
-  total: number;
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class OrganisationService {
   private readonly http = inject(HttpClient);
 
-  getPage(page: number, pageSize: number): Observable<OrganisationPage> {
+  getAll(): Observable<Organisation[]> {
     return this.http
       .get<RawOrganisation[]>('/data/organisations.json')
       .pipe(
-        map((records) => this.expandFixture(records)),
-        map((records) => {
-          const start = page * pageSize;
-          const items = records
-            .slice(start, start + pageSize)
-            .map((record) => this.normalize(record));
-
-          return {
-            items,
-            total: records.length,
-          };
-        }),
-        delay(this.randomDelay()),
+        mergeMap((records) =>
+          timer(this.randomDelay()).pipe(
+            mergeMap(() =>
+              Math.random() < 0.15
+                ? throwError(() => new Error('Mock list request failed'))
+                : of(records),
+            ),
+          ),
+        ),
+        map((records) =>
+          this.expandFixture(records).map((record) => this.normalize(record)),
+        ),
       );
   }
 
@@ -65,7 +60,7 @@ export class OrganisationService {
             ? ''
             : index % 11 === 0
               ? null
-              : `${source.name ?? 'Unnamed Organisation'} ${index + 1}`,
+              : `${source.name ?? en.unnamed} ${index + 1}`,
         status:
           index % 13 === 0
             ? 'actve'
@@ -100,9 +95,7 @@ export class OrganisationService {
   }
 
   private normalizeName(name: string | null): string {
-    const value = name?.trim();
-
-    return value || 'Unnamed organisation';
+    return name?.trim() ?? '';
   }
 
   private normalizeStatus(status: string | null): Organisation['status'] {

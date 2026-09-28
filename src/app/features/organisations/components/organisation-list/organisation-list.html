@@ -1,94 +1,71 @@
 <section class="organisation-list">
-  @if (loading()) {
-    <div class="state state-loading">
-      <p>Loading organisations...</p>
-    </div>
-  } @else if (error()) {
-    <div class="state state-error">
-      <p>Something went wrong while loading organisations.</p>
-
-      <button type="button" (click)="load()">
-        Try again
-      </button>
-    </div>
-  } @else if (organisations().length === 0) {
-    <div class="state state-empty">
-      <p>No organisations found.</p>
-    </div>
-  } @else {
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Members</th>
-            <th>Owner</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-
-        <tbody>
-         @for (organisation of organisations(); track $index) {
+  @switch (state()) {
+    @case ('loading') {
+      <div class="state state-loading" role="status"><p>{{ t.loading }}</p></div>
+    }
+    @case ('error') {
+      <div class="state state-error" role="alert">
+        <p>{{ t.loadError }}</p>
+        <button class="retry-button" type="button" (click)="retry.emit()">{{ t.retry }}</button>
+      </div>
+    }
+    @case ('empty') {
+      <div class="state state-empty"><p>{{ t.emptyList }}</p></div>
+    }
+    @case ('no-results') {
+      <div class="state state-empty"><p>{{ t.emptySearch }}</p></div>
+    }
+    @case ('ready') {
+      <div class="table-wrapper">
+        <table>
+          <caption class="sr-only">{{ t.organisationTable }}</caption>
+          <thead>
             <tr>
-              <td>{{ organisation.name }}</td>
-
-              <td>
-                <span
-                  class="status"
-                  [class.status-active]="organisation.status === 'active'"
-                  [class.status-inactive]="organisation.status === 'inactive'"
-                  [class.status-suspended]="organisation.status === 'suspended'"
-                >
-                  <span class="status-dot" aria-hidden="true"></span>
-
-                  {{ organisation.status }}
-                </span>
-              </td>
-
-              <td>
-                {{ organisation.memberCount ?? '—' }}
-              </td>
-
-              <td>
-                {{ organisation.ownerEmail ?? '—' }}
-              </td>
-
-              <td>
-                {{
-                  organisation.createdAt
-                    ? (organisation.createdAt | date: 'mediumDate')
-                    : '—'
-                }}
-              </td>
+              <th scope="col" [attr.aria-sort]="sortKey() === 'name' ? (sortDirection() === 'asc' ? 'ascending' : 'descending') : 'none'">
+                <button class="sort-button" type="button" [attr.aria-label]="t.sortName" (click)="sortChange.emit('name')">
+                  {{ t.name }}
+                  @if (sortKey() === 'name') {
+                    <span class="sort-direction">{{ sortDirection() === 'asc' ? t.sortAscending : t.sortDescending }}</span>
+                  }
+                </button>
+              </th>
+              <th scope="col">{{ t.status }}</th>
+              <th scope="col">{{ t.members }}</th>
+              <th scope="col">{{ t.owner }}</th>
+              <th scope="col" [attr.aria-sort]="sortKey() === 'createdAt' ? (sortDirection() === 'asc' ? 'ascending' : 'descending') : 'none'">
+                <button class="sort-button" type="button" [attr.aria-label]="t.sortCreated" (click)="sortChange.emit('createdAt')">
+                  {{ t.created }}
+                  @if (sortKey() === 'createdAt') {
+                    <span class="sort-direction">{{ sortDirection() === 'asc' ? t.sortAscending : t.sortDescending }}</span>
+                  }
+                </button>
+              </th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="pagination">
-      <button
-        type="button"
-        [disabled]="page() === 0 || loading()"
-        (click)="previousPage()"
-      >
-        Previous
-      </button>
-
-      <span>
-        Page {{ page() + 1 }} of {{ Math.ceil(total() / pageSize) }}
-      </span>
-
-      <button
-        type="button"
-        [disabled]="
-          page() >= Math.ceil(total() / pageSize) - 1 || loading()
-        "
-        (click)="nextPage()"
-      >
-        Next
-      </button>
-    </div>
+          </thead>
+          <tbody>
+            @for (organisation of organisations(); track $index) {
+              <tr>
+                <td class="name-cell">{{ organisation.name || t.unnamed }}</td>
+                <td>
+                  <span
+                    class="status"
+                    [class.status-active]="organisation.status === 'active'"
+                    [class.status-inactive]="organisation.status === 'inactive'"
+                    [class.status-suspended]="organisation.status === 'suspended'"
+                    [class.status-unknown]="organisation.status === 'unknown'"
+                  >
+                    <span class="status-dot" aria-hidden="true"></span>
+                    {{ statusLabel(organisation.status) }}
+                  </span>
+                </td>
+                <td>{{ organisation.memberCount ?? t.notProvided }}</td>
+                <td class="owner-cell">{{ organisation.ownerEmail ?? t.notProvided }}</td>
+                <td>{{ organisation.createdAt ? (organisation.createdAt | date: 'mediumDate') : t.notProvided }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
   }
 </section>

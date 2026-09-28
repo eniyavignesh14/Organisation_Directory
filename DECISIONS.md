@@ -1,0 +1,8 @@
+# Decisions
+
+- **Conflict 1, no UI pagination:** Chose the ops team's one-screen view. The local fixture mock returns all 137 records in one request, and the table has no pager. Rejected simulating the API's 25-record/5-requests-per-minute limits because that would delay the sixth batch by at least a minute and defeat the requested immediate full-list view. This mock therefore does not represent those production API limits; production would need a negotiated bulk endpoint or an explicit latency trade-off.
+- **Conflict 2, status display:** Kept a colored status dot and added a visible translated text label beside it. Rejected dot-only status because it fails the accessibility requirement that information cannot rely on color alone.
+- **Fixture quality:** Kept malformed values, duplicate IDs, and the long name; normalized invalid counts, dates, and owner emails to missing values, blank names to a translated fallback, and unknown status strings to `unknown`. Rows are not deduplicated.
+- **Mock behavior:** Expanded the fixture to 137 records and simulate a 400–900 ms response delay with a 15% list failure rate. Newly created organisations are held in memory because there is no backend, so they do not persist after reload.
+- **Translations and styling:** User-facing copy lives in `src/assets/i18n/en.json`. Colors and spacing are CSS custom properties in `src/styles.css`.
+- **AI-tool declaration:** This implementation was developed with AI assistance using GitHub Copilot. Changes were reviewed and the production build was verified.

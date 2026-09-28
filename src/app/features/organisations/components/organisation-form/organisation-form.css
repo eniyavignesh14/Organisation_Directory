@@ -1,0 +1,129 @@
+.organisation-form {
+	padding: var(--space-5);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface);
+}
+
+.form-header,
+.form-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3);
+}
+
+.form-header {
+	margin-bottom: var(--space-4);
+}
+
+.form-header h2 {
+	margin: 0;
+	font-size: var(--font-size-heading);
+}
+
+.text-button,
+.button-primary,
+.button-secondary {
+	min-height: var(--control-height);
+	padding: var(--space-2) var(--space-3);
+	border: var(--border-width) solid transparent;
+	border-radius: var(--radius-sm);
+	font: inherit;
+	cursor: pointer;
+}
+
+.text-button {
+	color: var(--color-primary);
+	background: transparent;
+}
+
+.button-primary {
+	color: var(--color-on-primary);
+	background: var(--color-primary);
+}
+
+.button-primary:hover {
+	background: var(--color-primary-hover);
+}
+
+.button-secondary {
+	border-color: var(--color-border);
+	color: var(--color-text);
+	background: var(--color-surface);
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--space-4);
+}
+
+.field {
+	display: grid;
+	align-content: start;
+	gap: var(--space-2);
+	min-width: 0;
+}
+
+.field-name {
+	grid-column: 1 / -1;
+}
+
+.field label {
+	color: var(--color-text-secondary);
+	font-size: var(--font-size-small);
+	font-weight: 600;
+}
+
+.field input,
+.field select {
+	width: 100%;
+	min-height: var(--control-height);
+	padding: var(--space-2) var(--space-3);
+	border: var(--border-width) solid var(--color-border);
+	border-radius: var(--radius-sm);
+	color: var(--color-text);
+	background: var(--color-surface);
+	font: inherit;
+}
+
+.field input:focus,
+.field select:focus {
+	outline: var(--focus-width) solid var(--color-focus);
+	outline-offset: var(--focus-offset);
+}
+
+.field input[aria-invalid='true'] {
+	border-color: var(--color-danger);
+}
+
+.field-error,
+.form-summary {
+	margin: 0;
+	color: var(--color-danger);
+	font-size: var(--font-size-small);
+}
+
+.form-summary {
+	margin-bottom: var(--space-4);
+}
+
+.form-actions {
+	justify-content: flex-start;
+	margin-top: var(--space-5);
+}
+
+@media (max-width: 42rem) {
+	.organisation-form {
+		padding: var(--space-4);
+	}
+
+	.form-grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.field-name {
+		grid-column: auto;
+	}
+}

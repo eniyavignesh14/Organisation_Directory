@@ -1,10 +1,56 @@
 <main class="organisation-page">
   <header class="page-header">
     <div>
-      <h1>Organisation Directory</h1>
-      <p>Find and manage organisations.</p>
+      <h1>{{ t.appTitle }}</h1>
+      <p>{{ t.appDescription }}</p>
     </div>
+    <button class="add-button" type="button" (click)="formOpen.set(!formOpen())">
+      {{ formOpen() ? t.closeForm : t.createOrganisation }}
+    </button>
   </header>
 
-  <app-organisation-list />
+  @if (formOpen()) {
+    <app-organisation-form
+      [existingOrganisations]="organisations()"
+      (created)="addOrganisation($event)"
+      (cancelled)="formOpen.set(false)"
+    />
+  }
+
+  <section class="directory-controls" [attr.aria-label]="t.organisationTable">
+    <div class="search-field">
+      <label for="organisation-search">{{ t.searchLabel }}</label>
+      <input
+        id="organisation-search"
+        type="search"
+        [value]="searchInput()"
+        [placeholder]="t.searchPlaceholder"
+        (input)="onSearchInput($event)"
+      />
+    </div>
+
+    <div class="filter-field">
+      <label for="organisation-filter">{{ t.statusFilterLabel }}</label>
+      <select id="organisation-filter" [value]="statusFilter()" (change)="onStatusChange($event)">
+        <option value="all">{{ t.statusAll }}</option>
+        <option value="active">{{ t.statusActive }}</option>
+        <option value="inactive">{{ t.statusInactive }}</option>
+        <option value="suspended">{{ t.statusSuspended }}</option>
+        <option value="unknown">{{ t.statusUnknown }}</option>
+      </select>
+    </div>
+
+    <p class="result-count" aria-live="polite">{{ resultCount(filteredOrganisations().length) }}</p>
+  </section>
+
+  <p class="sr-only" aria-live="polite">{{ announcement() }}</p>
+
+  <app-organisation-list
+    [organisations]="filteredOrganisations()"
+    [state]="listState()"
+    [sortKey]="sortKey()"
+    [sortDirection]="sortDirection()"
+    (retry)="load()"
+    (sortChange)="toggleSort($event)"
+  />
 </main>

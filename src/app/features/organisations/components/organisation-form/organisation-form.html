@@ -1,1 +1,99 @@
-<p>organisation-form works!</p>
+<section class="organisation-form" [attr.aria-labelledby]="'form-title'">
+	<header class="form-header">
+		<h2 id="form-title">{{ t.formTitle }}</h2>
+		<button class="text-button" type="button" (click)="cancel()">{{ t.cancel }}</button>
+	</header>
+
+	@if (submitted() && form.invalid) {
+		<p class="form-summary" role="alert">{{ t.formErrorSummary }}</p>
+	}
+
+	<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+		<div class="form-grid">
+			<div class="field field-name">
+				<label for="organisation-name">{{ t.nameLabel }}</label>
+				<input
+					id="organisation-name"
+					type="text"
+					formControlName="name"
+					[placeholder]="t.namePlaceholder"
+					[attr.aria-invalid]="form.controls.name.touched && form.controls.name.invalid"
+					[attr.aria-describedby]="form.controls.name.touched && form.controls.name.invalid ? 'name-error' : null"
+					(blur)="validateUniqueName()"
+				/>
+				@if (form.controls.name.touched && form.controls.name.errors; as errors) {
+					<p class="field-error" id="name-error">
+						@if (errors['required']) {
+							{{ t.nameRequired }}
+						} @else if (errors['minlength']) {
+							{{ t.nameMinLength }}
+						} @else if (errors['maxlength']) {
+							{{ t.nameMaxLength }}
+						} @else if (errors['duplicate']) {
+							{{ t.nameNotUnique }}
+						}
+					</p>
+				}
+			</div>
+
+			<div class="field">
+				<label for="organisation-status">{{ t.statusLabel }}</label>
+				<select
+					id="organisation-status"
+					formControlName="status"
+					[attr.aria-invalid]="form.controls.status.touched && form.controls.status.invalid"
+					[attr.aria-describedby]="form.controls.status.touched && form.controls.status.invalid ? 'status-error' : null"
+				>
+					<option value="">{{ t.statusRequired }}</option>
+					<option value="active">{{ t.statusActive }}</option>
+					<option value="inactive">{{ t.statusInactive }}</option>
+					<option value="suspended">{{ t.statusSuspended }}</option>
+				</select>
+				@if (form.controls.status.touched && form.controls.status.invalid) {
+					<p class="field-error" id="status-error">{{ t.statusRequired }}</p>
+				}
+			</div>
+
+			<div class="field">
+				<label for="organisation-owner">{{ t.ownerEmailLabel }}</label>
+				<input
+					id="organisation-owner"
+					type="email"
+					formControlName="ownerEmail"
+					[placeholder]="t.ownerEmailPlaceholder"
+					[attr.aria-invalid]="form.controls.ownerEmail.touched && form.controls.ownerEmail.invalid"
+					[attr.aria-describedby]="form.controls.ownerEmail.touched && form.controls.ownerEmail.invalid ? 'owner-error' : null"
+				/>
+				@if (form.controls.ownerEmail.touched && form.controls.ownerEmail.errors; as errors) {
+					<p class="field-error" id="owner-error">
+						@if (errors['required']) {
+							{{ t.emailRequired }}
+						} @else if (errors['email']) {
+							{{ t.emailInvalid }}
+						}
+					</p>
+				}
+			</div>
+
+			<div class="field">
+				<label for="organisation-members">{{ t.memberCountLabel }}</label>
+				<input
+					id="organisation-members"
+					type="text"
+					inputmode="numeric"
+					formControlName="memberCount"
+					[attr.aria-invalid]="form.controls.memberCount.touched && form.controls.memberCount.invalid"
+					[attr.aria-describedby]="form.controls.memberCount.touched && form.controls.memberCount.invalid ? 'members-error' : null"
+				/>
+				@if (form.controls.memberCount.touched && form.controls.memberCount.invalid) {
+					<p class="field-error" id="members-error">{{ t.memberCountInvalid }}</p>
+				}
+			</div>
+		</div>
+
+		<footer class="form-actions">
+			<button class="button-primary" type="submit">{{ t.submitOrganisation }}</button>
+			<button class="button-secondary" type="button" (click)="cancel()">{{ t.cancel }}</button>
+		</footer>
+	</form>
+</section>

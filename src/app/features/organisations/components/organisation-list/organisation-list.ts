@@ -1,9 +1,11 @@
-import { Component, inject,OnInit, signal } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Organisation } from '../../../../core/models/organisation.model';
-import { OrganisationService } from '../../../../core/services/organisation.service';
 import { DatePipe } from '@angular/common';
+import en from '../../../../../assets/i18n/en.json';
 
-
+type ListState = 'loading' | 'error' | 'empty' | 'no-results' | 'ready';
+type SortKey = 'name' | 'createdAt';
+type SortDirection = 'asc' | 'desc';
 
 @Component({
   selector: 'app-organisation-list',
@@ -12,55 +14,21 @@ import { DatePipe } from '@angular/common';
   templateUrl: './organisation-list.html',
   styleUrl: './organisation-list.css',
 })
-export class OrganisationList implements OnInit{
-  private readonly organisationService = inject(OrganisationService);
+export class OrganisationList {
+  protected readonly t = en;
+  readonly organisations = input<Organisation[]>([]);
+  readonly state = input<ListState>('empty');
+  readonly sortKey = input<SortKey>('name');
+  readonly sortDirection = input<SortDirection>('asc');
+  readonly retry = output<void>();
+  readonly sortChange = output<SortKey>();
 
-  protected readonly organisations = signal<Organisation[]>([]);
-  protected readonly loading = signal(false);
-  protected readonly error = signal(false);
-
-  protected readonly page = signal(0);
-  protected readonly pageSize = 25;
-  protected readonly total = signal(0);
-  protected readonly Math = Math;
-
- ngOnInit(): void {
-    this.load();
-  }
-
-  protected load(): void {
-    this.loading.set(true);
-    this.error.set(false);
-
-    this.organisationService.getPage(this.page(), this.pageSize).subscribe({
-      next: (response) => {
-        this.organisations.set(response.items);
-        this.total.set(response.total);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.error.set(true);
-        this.loading.set(false);
-      },
-    });
-  }
-    protected previousPage(): void {
-    if (this.page() === 0) {
-      return;
+  protected statusLabel(status: Organisation['status']): string {
+    switch (status) {
+      case 'active': return this.t.statusActive;
+      case 'inactive': return this.t.statusInactive;
+      case 'suspended': return this.t.statusSuspended;
+      default: return this.t.statusUnknown;
     }
-
-    this.page.update((value) => value - 1);
-    this.load();
-  }
-
-  protected nextPage(): void {
-    const lastPage = Math.ceil(this.total() / this.pageSize) - 1;
-
-    if (this.page() >= lastPage) {
-      return;
-    }
-
-    this.page.update((value) => value + 1);
-    this.load();
   }
 }
